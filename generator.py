@@ -16,6 +16,8 @@ hide_st_style = """
             </style>
             """
 
+st.markdown(hide_st_style, unsafe_allow_html=True)
+
 def single_choice_crosstab(df, q, column =None, value='weight', column_seq=None, row_seq=None):
     if row_seq != None:
         row_labels = row_seq + ["Grand Total"]
