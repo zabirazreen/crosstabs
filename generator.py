@@ -178,12 +178,3 @@ if df:
                             st.balloons()
                             st.header('Crosstabs ready for download!')
                             st.download_button(label='📥 Download', data=df_xlsx, file_name= df_name + '-crosstabs.xlsx')
-                                
-
-
-
-                    
-
-
-
-
