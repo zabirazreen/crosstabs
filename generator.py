@@ -8,6 +8,7 @@ from PIL import Image
 import matplotlib.pyplot as plt
 from colour import Color
 
+# Hide streamlit header and footer
 hide_st_style = """
             <style>
             #MainMenu {visibility: hidden;}
@@ -19,6 +20,16 @@ hide_st_style = """
 st.markdown(hide_st_style, unsafe_allow_html=True)
 
 def single_choice_crosstab(df, q, column =None, value='weight', column_seq=None, row_seq=None):
+    '''
+    Create a table for single choice questions.
+    
+    df: Whole dataframe [pandas dataframe]
+    q: Column name of the question you're building the table on [str]
+    column: Column name of the demographic column that you're building the table across, would only generate the grand total when undefined [str]
+    value: Column name of your weights [str]
+    column_seq: Order of demographic sequence [list]
+    row_seq: Order of answer sequence [list]
+    '''
     if row_seq != None:
         row_labels = row_seq + ["Grand Total"]
     else:
@@ -47,6 +58,16 @@ def single_choice_crosstab(df, q, column =None, value='weight', column_seq=None,
     return df_ct
 
 def multi_choice_crosstab(df, q, column, value='weight', column_seq=None):
+    '''
+    Create a table for multi choice questions.
+    
+    df: Whole dataframe [pandas dataframe]
+    q: Column name of the question you're building the table on [str]
+    column: Column name of the demographic column that you're building the table across, would only generate the grand total when undefined [str]
+    value: Column name of your weights [str]
+    column_seq: Order of demographic sequence [list]
+    row_seq: Order of answer sequence [list]
+    '''
     if column_seq != None:
         column_seq =  column_seq + ['Grand Total']
     else:
@@ -101,6 +122,7 @@ st.subheader("Upload Survey responses (csv/xlsx)")
 df = st.file_uploader("Please ensure the data are cleaned and weighted (if need to be) prior to uploading.")
 if df:
     df_name = df.name
+    # check file type and read them accordingly
     if df_name[-3:] == 'csv':
         df = pd.read_csv(df, na_filter = False)
     else:
@@ -110,6 +132,7 @@ if df:
     if weight != '':
         demos = st.multiselect('Choose the demograhic(s) you want to build the crosstabs across', list(df.columns))
         if len(demos) > 0:
+            # Ensure that all the demographic values have been selected before proceeding
             score = 0
             col_seqs = {}
             for demo in demos:
@@ -131,9 +154,11 @@ if df:
                         button = st.button('Generate Crosstabs')
                         if button:
                             with st.spinner('Building crosstabs...'):
+                                # Initialize excel file
                                 output = BytesIO()
                                 writer = pd.ExcelWriter(output, engine='xlsxwriter')
                                 df.to_excel(writer, index=False, sheet_name= 'data')
+                                # Write tables one by one according to the type of question
                                 for demo in demos:
                                     start = 1
                                     for q in q_ls:
